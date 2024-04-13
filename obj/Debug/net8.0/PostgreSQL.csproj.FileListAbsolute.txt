@@ -17,3 +17,4 @@
 /home/tarachom/Old/PostgreSQL/obj/Debug/net8.0/PostgreSQL.pdb
 /home/tarachom/Old/PostgreSQL/obj/Debug/net8.0/PostgreSQL.genruntimeconfig.cache
 /home/tarachom/Old/PostgreSQL/obj/Debug/net8.0/ref/PostgreSQL.dll
+/home/tarachom/Old/PostgreSQL/obj/Debug/net8.0/PostgreSQL.sourcelink.json

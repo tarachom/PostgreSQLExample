@@ -2,7 +2,7 @@
 
 PostgreSQL postgreSQL = new();
 
-if (postgreSQL.Open("localhost", "postgres", "1", 5432, "test") && 
+if (postgreSQL.Open("localhost", "postgres", "1", 5432, "test") &&
     await postgreSQL.TryConnection())
 {
     // Додаємо нову таблицю
@@ -25,20 +25,22 @@ CREATE INDEX IF NOT EXISTS tab1_datewrite_idx ON tab1(datewrite)");
 
     // Додаємо новий запис в таблицю
     {
+        var param = new Dictionary<string, object>() { { "info_text", "text text text" } };
+        
         await postgreSQL.ExecuteSQL($@"
 INSERT INTO tab1 (datewrite, info) 
-VALUES (CURRENT_TIMESTAMP, @info_text)",
-        new Dictionary<string, object>() { { "info_text", "text text text" } });
+VALUES (CURRENT_TIMESTAMP, @info_text)", param);
     }
 
     // Оновлення даних якщо дата запису менше 30 секунд
     {
+        var param = new Dictionary<string, object>() { { "info_text", "text update" } };
+
         await postgreSQL.ExecuteSQL($@"
 UPDATE tab1 
     SET info = @info_text 
 WHERE
-    datewrite < (CURRENT_TIMESTAMP::timestamp - INTERVAL '30 seconds')",
-        new Dictionary<string, object>() { { "info_text", "text update" } });
+    datewrite < (CURRENT_TIMESTAMP::timestamp - INTERVAL '30 seconds')", param);
     }
 
     // Видалення даних якщо дата запису менше 2 хвилин
