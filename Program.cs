@@ -68,7 +68,7 @@ ORDER BY
             {
                 string line = "";
                 foreach (var column in recordResult.ColumnsName)
-                    line += row[column] + " ";
+                    line += row[column].ToString() + " ";
 
                 Console.WriteLine(line);
             }
