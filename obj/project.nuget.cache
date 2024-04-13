@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "rmtsGhP2FI5DfNIZQe9aoq1ECICo/QpAQSCV/YWVcw7wgER04qghvKPdGEwxVUVXiHwBy5iklppU3QypqgIYjQ==",
+  "success": true,
+  "projectFilePath": "/home/tarachom/Old/PostgreSQL/PostgreSQL.csproj",
+  "expectedPackageFiles": [
+    "/home/tarachom/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/home/tarachom/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/home/tarachom/.nuget/packages/npgsql/8.0.2/npgsql.8.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
