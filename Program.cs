@@ -138,6 +138,7 @@ class PostgreSQL
             return false;
     }
 
+    //Створення бази
     public async ValueTask<bool> CreateDatabaseIfNotExist(string Server, string UserId, string Password, int Port, string Database)
     {
         string conString = $"Server={Server};Username={UserId};Password={Password};Port={Port};SSLMode=Prefer;";
@@ -177,6 +178,7 @@ class PostgreSQL
             return false;
     }
 
+    //Перевірка наявності бази
     async ValueTask<bool> IfExistDatabase(string Database)
     {
         if (DataSource != null)
