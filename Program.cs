@@ -2,7 +2,17 @@
 
 PostgreSQL postgreSQL = new();
 
-if (postgreSQL.Open("localhost", "postgres", "1", 5432, "test") &&
+const string database = "test5";
+
+//Створення бази даних якщо така база ще не створена
+if (!await postgreSQL.CreateDatabaseIfNotExist("localhost", "postgres", "1", 5432, database))
+{
+    Console.WriteLine("Невдалось створити базу даних");
+    return;
+}
+
+//Підключення до бази даних
+if (postgreSQL.Open("localhost", "postgres", "1", 5432, database) &&
     await postgreSQL.TryConnection())
 {
     // Додаємо нову таблицю
@@ -26,7 +36,7 @@ CREATE INDEX IF NOT EXISTS tab1_datewrite_idx ON tab1(datewrite)");
     // Додаємо новий запис в таблицю
     {
         var param = new Dictionary<string, object>() { { "info_text", "text text text" } };
-        
+
         await postgreSQL.ExecuteSQL($@"
 INSERT INTO tab1 (datewrite, info) 
 VALUES (CURRENT_TIMESTAMP, @info_text)", param);
@@ -77,14 +87,13 @@ ORDER BY
 else
     Console.WriteLine("Невдалось підключитися до сервера");
 
+Console.ReadLine();
 
 class PostgreSQL
 {
     NpgsqlDataSource? DataSource { get; set; }
 
-    /// <summary>
-    /// Підключення до сервера
-    /// </summary>
+    // Підключення до сервера
     public bool Open(string Server, string UserId, string Password, int Port, string Database)
     {
         string conString = $"Server={Server};Username={UserId};Password={Password};Port={Port};Database={Database};SSLMode=Prefer;";
@@ -103,9 +112,7 @@ class PostgreSQL
         }
     }
 
-    /// <summary>
-    /// Перевірка підключення
-    /// </summary>
+    // Перевірка підключення
     public async ValueTask<bool> TryConnection()
     {
         if (DataSource != null)
@@ -127,9 +134,79 @@ class PostgreSQL
             return false;
     }
 
-    /// <summary>
-    /// Виконання запиту який не повертає результату
-    /// </summary>
+    public async ValueTask<bool> CreateDatabaseIfNotExist(string Server, string UserId, string Password, int Port, string Database)
+    {
+        string conString = $"Server={Server};Username={UserId};Password={Password};Port={Port};SSLMode=Prefer;";
+
+        try
+        {
+            NpgsqlDataSourceBuilder dataBuilder = new(conString);
+            DataSource = dataBuilder.Build();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return false;
+        }
+
+        if (DataSource != null)
+        {
+            if (!await IfExistDatabase(Database))
+            {
+                NpgsqlCommand command = DataSource.CreateCommand($"CREATE DATABASE {Database}");
+
+                try
+                {
+                    await command.ExecuteNonQueryAsync();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return false;
+                }
+            }
+            else
+                return true;
+        }
+        else
+            return false;
+    }
+
+    async ValueTask<bool> IfExistDatabase(string Database)
+    {
+        if (DataSource != null)
+        {
+            string sql = @"
+SELECT EXISTS
+(
+    SELECT 
+        datname 
+    FROM 
+        pg_catalog.pg_database 
+    WHERE 
+        lower(datname) = lower(@databasename)
+)";
+
+            NpgsqlCommand command = DataSource.CreateCommand(sql);
+            command.Parameters.AddWithValue("databasename", Database);
+
+            try
+            {
+                object? result = await command.ExecuteScalarAsync();
+                return bool.Parse(result?.ToString() ?? "false");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+        }
+        else
+            return false;
+    }
+
+    // Виконання запиту який не повертає результату
     public async ValueTask<int> ExecuteSQL(string query, Dictionary<string, object>? paramQuery = null)
     {
         if (DataSource != null)
@@ -146,9 +223,7 @@ class PostgreSQL
             return -1;
     }
 
-    /// <summary>
-    /// Виконання запиту який повертає результати
-    /// </summary>
+    // Виконання запиту який повертає результати
     public async ValueTask<SelectRequestRecord> SelectRequest(string selectQuery, Dictionary<string, object>? paramQuery = null)
     {
         SelectRequestRecord record = new();
@@ -187,24 +262,15 @@ class PostgreSQL
     }
 }
 
-/// <summary>
-/// Структура для повернення результату з функції SelectRequest
-/// </summary>
+// Структура для повернення результату з функції SelectRequest
 public record SelectRequestRecord
 {
-    /// <summary>
-    /// Результат функції
-    /// </summary>
+    // Результат функції
     public bool Result;
 
-    /// <summary>
-    /// Колонки
-    /// </summary>
+    // Колонки
     public string[] ColumnsName = [];
 
-    /// <summary>
-    /// Список рядків
-    /// </summary>
+    // Список рядків
     public List<Dictionary<string, object>> ListRow = [];
 }
-
