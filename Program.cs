@@ -48,7 +48,7 @@ WHERE
         await postgreSQL.ExecuteSQL($@"
 DELETE FROM tab1  
 WHERE
-    datewrite < (CURRENT_TIMESTAMP::timestamp - INTERVAL '120 seconds')");
+    datewrite < (CURRENT_TIMESTAMP::timestamp - INTERVAL '2 minute')");
     }
 
     // Вибірка
