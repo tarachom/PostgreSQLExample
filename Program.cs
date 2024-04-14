@@ -1,18 +1,22 @@
 ﻿using Npgsql;
 
-PostgreSQL postgreSQL = new();
-
+const string host = "localhost";
+const string user = "postgres";
+const string password = "1";
+const int port = 5432;
 const string database = "test5";
 
+PostgreSQL postgreSQL = new();
+
 //Створення бази даних якщо така база ще не створена
-if (!await postgreSQL.CreateDatabaseIfNotExist("localhost", "postgres", "1", 5432, database))
+if (!await postgreSQL.CreateDatabaseIfNotExist(host, user, password, port, database))
 {
     Console.WriteLine("Невдалось створити базу даних");
     return;
 }
 
 //Підключення до бази даних
-if (postgreSQL.Open("localhost", "postgres", "1", 5432, database) &&
+if (postgreSQL.Open(host, user, password, port, database) &&
     await postgreSQL.TryConnection())
 {
     // Додаємо нову таблицю
